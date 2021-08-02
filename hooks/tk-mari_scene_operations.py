@@ -111,7 +111,7 @@ class MariSceneOperations(Hook):
                 self.parent.sgtk, all_paths, fields=fields
             )
         except TankError as e:
-            raise TankError("Failed to query publishes from Shotgun: %s" % e)
+            raise TankError("Failed to query publishes from ShotGrid: %s" % e)
 
         # now we have all the info we need to update geometry:
         for item in items:
@@ -122,7 +122,7 @@ class MariSceneOperations(Hook):
             sg_publish_data = found_publishes.get(publish_path)
             if not sg_publish_data:
                 raise TankError(
-                    "Failed to find Shotgun publish record for '%s'" % publish_path
+                    "Failed to find SG publish record for '%s'" % publish_path
                 )
 
             # find geo in project:
