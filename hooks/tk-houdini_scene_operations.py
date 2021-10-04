@@ -50,10 +50,20 @@ class BreakdownSceneOperations(Hook):
         alembic_nodes = hou.nodeType(hou.sopNodeTypeCategory(), "alembic").instances()
 
         # get a tuple of all regular file nodes in the file
-        file_nodes_unfiltered = hou.nodeType(hou.sopNodeTypeCategory(), "file").instances()
+        file_nodes_unfiltered = hou.nodeType(
+            hou.sopNodeTypeCategory(), "file"
+        ).instances()
+
+        reference_nodes = hou.nodeType(
+            hou.lopNodeTypeCategory(), "reference"
+        ).instances()
 
         # refine tuple of all regular file nodes to exclude file nodes inside locked digital asset
-        file_nodes = tuple(file_node for file_node in file_nodes_unfiltered if not file_node.isInsideLockedHDA())
+        file_nodes = tuple(
+            file_node
+            for file_node in file_nodes_unfiltered
+            if not file_node.isInsideLockedHDA()
+        )
 
         # return an item for each alembic node found. the breakdown app will check
         # the paths of each looking for a template match and a newer version
@@ -74,8 +84,15 @@ class BreakdownSceneOperations(Hook):
             file_parm = file_node.parm("file")
             file_path = os.path.normpath(file_parm.eval())
 
+            items.append({"node": file_node.path(), "type": "file", "path": file_path})
+
+        # search in all reference node
+        for reference_node in reference_nodes:
+            file_parm = reference_node.parm("filepath1")
+            file_path = os.path.normpath(file_parm.eval())
+
             items.append(
-                {"node": file_node.path(), "type": "file", "path": file_path}
+                {"node": reference_node.path(), "type": "reference", "path": file_path}
             )
 
         return items
@@ -115,8 +132,8 @@ class BreakdownSceneOperations(Hook):
                 alembic_node.parm("fileName").set(file_path)
 
             # update the file node file parameter to the new path
-            if node_type == 'file':
-                
+            if node_type == "file":
+
                 frame_match_path = re.search(frame_pattern_path, file_path)
 
                 if frame_match_path:
@@ -129,3 +146,11 @@ class BreakdownSceneOperations(Hook):
                     "Updating file node '%s' to: %s" % (node_path, file_path)
                 )
                 file_node.parm("file").set(file_path)
+
+            # update the reference node paramter to the new path
+            if node_type == "reference":
+                reference_node = hou.node(node_path)
+                engine.log_debug(
+                    "Updating file node '%s' to: %s" % (node_path, file_path)
+                )
+                reference_node.parm("filepath1").set(file_path)
