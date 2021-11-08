@@ -111,7 +111,7 @@ class BreakdownSceneOperations(HookBaseClass):
         """
         engine = self.parent.engine
 
-        node_type_list = ["Read", "ReadGeo2", "Camera3"]
+        node_type_list = ["Read", "ReadGeo2", "Camera2", "Camera3"]
 
         for i in items:
             node_name = i["node"]
