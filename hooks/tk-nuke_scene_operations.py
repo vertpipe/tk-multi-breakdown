@@ -90,11 +90,11 @@ class BreakdownSceneOperations(HookBaseClass):
             reads.append({"node": node_name, "type": "ReadGeo2", "path": path})
 
         # then the read camera nodes
-        for node in nuke.allNodes("Camera2"):
+        for node in nuke.allNodes("Camera3"):
             node_name = node.name()
 
             path = node.knob("file").value().replace("/", os.path.sep)
-            reads.append({"node": node_name, "type": "Camera2", "path": path})
+            reads.append({"node": node_name, "type": "Camera3", "path": path})
 
         return reads
 
@@ -111,7 +111,7 @@ class BreakdownSceneOperations(HookBaseClass):
         """
         engine = self.parent.engine
 
-        node_type_list = ["Read", "ReadGeo2", "Camera2"]
+        node_type_list = ["Read", "ReadGeo2", "Camera3"]
 
         for i in items:
             node_name = i["node"]
