@@ -58,6 +58,10 @@ class BreakdownSceneOperations(Hook):
             hou.lopNodeTypeCategory(), "reference"
         ).instances()
 
+        sublayer_nodes = hou.nodeType(
+            hou.lopNodeTypeCategory(), "sublayer"
+        ).instances()
+
         # refine tuple of all regular file nodes to exclude file nodes inside locked digital asset
         file_nodes = tuple(
             file_node
@@ -93,6 +97,15 @@ class BreakdownSceneOperations(Hook):
 
             items.append(
                 {"node": reference_node.path(), "type": "reference", "path": file_path}
+            )
+
+        # search in all sublayer node
+        for sublayer_node in sublayer_nodes:
+            file_parm = sublayer_node.parm("filepath1")
+            file_path = os.path.normpath(file_parm.eval())
+
+            items.append(
+                {"node": sublayer_node.path(), "type": "sublayer", "path": file_path}
             )
 
         return items
@@ -154,3 +167,11 @@ class BreakdownSceneOperations(Hook):
                     "Updating file node '%s' to: %s" % (node_path, file_path)
                 )
                 reference_node.parm("filepath1").set(file_path)
+
+            # update the sublayer node paramter to the new path
+            if node_type == "sublayer":
+                sublayer_node = hou.node(node_path)
+                engine.log_debug(
+                    "Updating file node '%s' to: %s" % (node_path, file_path)
+                )
+                sublayer_node.parm("filepath1").set(file_path)
